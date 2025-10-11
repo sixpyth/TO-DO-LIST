@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/main_page.css">
+    <title>Document</title>
+</head>
+<body>
+    
+
+    
+    <form method="post" action="/registration"> 
+        <input type="text" name="user_name" pattern="[A-Za-z0-9]+" title="В логине должны присутсовать английские буквы"  required id="">Логин
+        <input type="text" name="user_password" required id="">Пароль
+        <button type="submit">Зарегистрироваться</button>
+    </form>
+        
+        {% if error %}
+        <div class="popup">
+        {{ error }}
+        </div>
+        {% endif %}
+
+        <style>
+        .popup {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: #f44336;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+
+        /* начальное состояние */
+        opacity: 0;
+
+        /* запускаем сразу 2 анимации: появление и исчезновение */
+        animation: fadein 0.5s forwards, fadeout 0.5s 5s forwards;
+        }
+
+        @keyframes fadein {
+        from {opacity: 0; transform: translateY(20px);}
+        to   {opacity: 1; transform: translateY(0);}
+        }
+
+        @keyframes fadeout {
+        from {opacity: 1; transform: translateY(0);}
+        to   {opacity: 0; transform: translateY(20px);}
+        }
+        </style>
+
+
+
+        {% if not sessions %}
+
+    <form class="login" method="post" action="/login"> 
+        <input type="text" name="user_name" required id="">Логин
+        <input type="text" name="user_password" required id="">Пароль
+        <button type="submit">Войти</button>
+    </form>
+    {%else%}
+
+    <form method="get" action="/exit">
+        <button style="float: right;background-color: transparent;border-color: transparent; padding-right: 10px;">Выйти</button>
+    </form>
+       <form action="/profile"><span style="color: gray;float: right;padding-right: 5px;">Добро пожаловать<button style="color: gray;border: transparent;background-color: transparent;font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;font-size: 16px;font-weight: bold;">{{user_name}}</button></span> 
+        </form>
+        {%endif%}
+    <br>
+    <form method="post" action="/add_task"> 
+        <input type="text" name="task" id="">
+        <button>Добавить задачу</button>
+    </form>
+
+   
+
+    <h1>Задачи</h1>
+     <form method="post" action="/order">
+            <select name="order" id="" onchange="this.form.submit()">
+            <option value="high">Высокий приоритет</option>
+            <option value="high">Средний приоритет</option>
+            <option value="high">Низкий приоритет</option>
+                </select>
+        </form>
+   {% if not tasks %}
+    <h3>Нет задач</h3>
+    
+{% else %}
+    <ul>
+    {% for i in tasks %}
+        {%if i.done == 0%}
+            <div class="task">
+                <h1> <span style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 32px; color: rgb(92, 92, 92);">{{ i[0] }}</span><span style="font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; font-size:30px; color: rgba(138, 137, 137, 0.5)"> - {{i[1]}}</span></h1>
+                <form class="emoji" method="post" action="/delete/{{i.task_id}}">
+                    <button>❌</button>
+                </form>
+                <div class="row">
+                <form  class="emoji" method="post" action="/edit/{{i.task_id}}">
+                    <button type="submit">✏️</button>
+                    <input type="text" name="new_text">
+                </form>
+                 <form method="post" action="/priority/{{i.task_id}}">
+        <select name="priority" id="" onchange="this.form.submit()">
+        <option value="1" {% if i.priority == 1 %}selected{% endif %}>Low</option>
+        <option value="2" {% if i.priority == 2 %}selected{% endif %}>Medium</option>
+        <option value="3" {% if i.priority == 3 %}selected{% endif %}>High</option>
+        </select>
+        <span style="color: #777777c3; font-size: 15    px;">Создано: {{i[5]}}</span>
+    </form>
+    </div>
+                <form  class="emoji" method="post" action="/done/{{i.task_id}}">
+                    <button type="submit">✅</button>
+                </form>
+            </div>
+            {%else%}
+                <div class="task">
+                    <s><h1> <span style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 32px; color: rgba(175, 175, 175, 0.767);">{{ i[0] }}</span></s><span style="font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; font-size:30px; color: rgba(138, 137, 137, 0.5)"> - {{i[1]}}</span></h1>
+                    <form class="emoji" method="post" action="/delete/{{i.task_id}}">
+                        <button>❌</button>
+                    </form>
+                    <form  class="emoji" method="post" action="/edit/{{i.task_id}}">
+                        <button type="submit">✏️</button>
+                        <input type="text" name="new_text">
+                    </form>
+                    <form  class="emoji" method="post" action="/done/{{i.task_id}}">
+                        <button type="submit">✅</button>
+                    </form>
+                </div>
+        {%endif%}
+    {% endfor %}
+    </ul>
+{% endif %}
+
+
+
+
+
+
+
+
+
+</body>
+</html>
